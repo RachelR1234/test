@@ -1,28 +1,42 @@
 name: Docker Build and Push to GHCR
+
 on:
   push:
     branches: [ "main" ]
+
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      packages: write # נדרש כדי לדחוף ל-GitHub Container Registry
 
     steps:
     - name: 🔄 Checkout repository
       uses: actions/checkout@v4
-    # 1. שלב חדש: הגדרת משתנה סביבה (env) בראש שלב ה-build
+      
+    # 💡 תיקון: שלב ייעודי להגדרת התגית באמצעות $GITHUB_OUTPUT 
+    - name: 🏷️ Calculate and Set Image Tag
+      id: meta
+      run: |
+        # משתמשים בביטוי | lower בתוך פקודת echo, שם הוא נתמך
+        REPO_NAME_LOWERCASE=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+        # מגדירים את ה-output לשימוש בשלב הבא
+        echo "IMAGE_TAG=ghcr.io/$REPO_NAME_LOWERCASE:latest" >> $GITHUB_OUTPUT
+
+    - name: 🔑 Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        # ודא שאת משתמשת בשם משתמש קבוע או ב-GITHUB_ACTOR (הכי מומלץ)
+        username: ${{ github.actor }} 
+        password: ${{ secrets.CR_PAT }} # משתמש בסוד שהגדרנו. ודא שהוא קיים!
+
     - name: 🔨 Build and push Docker image
       uses: docker/build-push-action@v5
-      # 2. הטרנספורמציה מבוצעת כאן (בתוך YAML)
-      env:
-        # כאן הטרנספורמציה עובדת!
-        #tags: ghcr.io/${{ github.repository | lower }}:latest        
-        IMAGE_TAG: ghcr.io/${{ github.repository | lower }}:latest
       with:
-        context: .
+        context: . # מיקום ה-Dockerfile (בתיקייה הנוכחית)
         push: true
-        # 3. שימוש במשתנה הסביבה החדש
-        tags: ${{ env.IMAGE_TAG }} 
-        # tags: ${{ steps.meta.outputs.IMAGE_ID }}
+        # שימוש בפלט מהשלב הקודם (ID: meta)
+        tags: ${{ steps.meta.outputs.IMAGE_TAG }}
+
