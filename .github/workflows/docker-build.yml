@@ -18,7 +18,7 @@ jobs:
       # 2. הטרנספורמציה מבוצעת כאן (בתוך YAML)
       env:
         # כאן הטרנספורמציה עובדת!
-        tags: ghcr.io/${{ github.repository | lower }}:latest        
+        #tags: ghcr.io/${{ github.repository | lower }}:latest        
         IMAGE_TAG: ghcr.io/${{ github.repository | lower }}:latest
       with:
         context: .
