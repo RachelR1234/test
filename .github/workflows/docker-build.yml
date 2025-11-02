@@ -1,6 +1,4 @@
 name: Docker Build and Push to GHCR
-
-# 👈 הוסף את החלק הזה ברמה הראשית (לא מוזח)
 on:
   push:
     branches: [ "main" ]
@@ -14,14 +12,13 @@ jobs:
     steps:
     - name: 🔄 Checkout repository
       uses: actions/checkout@v4
-
     # 1. שלב חדש: הגדרת משתנה סביבה (env) בראש שלב ה-build
     - name: 🔨 Build and push Docker image
       uses: docker/build-push-action@v5
       # 2. הטרנספורמציה מבוצעת כאן (בתוך YAML)
       env:
         # כאן הטרנספורמציה עובדת!
-        IMAGE_TAG: ghcr.io/${{ github.repository }}:latest
+        IMAGE_TAG: ghcr.io/${{ github.repository | lowser }}:latest
       with:
         context: .
         push: true
