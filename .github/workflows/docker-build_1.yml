@@ -11,22 +11,6 @@ jobs:
       contents: read
       packages: write # נדרש כדי לדחוף ל-GitHub Container Registry
 
-    # 💡 הוספת Job מקביל: הגדרת שירותי קונטיינר
-    services:
-      # הפעלת קונטיינר PostgreSQL ברקע
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: runner
-          POSTGRES_PASSWORD: password
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
     - name: 🔄 Checkout repository
       uses: actions/checkout@v4
@@ -47,13 +31,7 @@ jobs:
         # ודא שאת משתמשת בשם משתמש קבוע או ב-GITHUB_ACTOR (הכי מומלץ)
         username: ${{ github.actor }} 
         password: ${{ secrets.CR_PAT }} # משתמש בסוד שהגדרנו. ודא שהוא קיים!
-        
-    # שלב נוסף בודק אם השירות רץ:
-    - name: ⏳ Wait for Postgres Service
-      run: |
-        echo "Waiting for PostgreSQL to be ready on port 5432..."
-        # הפקודה הזו תרוץ רק אם הקונטיינר Postgres פועל
-    
+
     - name: 🔨 Build and push Docker image
       uses: docker/build-push-action@v5
       with:
