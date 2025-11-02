@@ -19,7 +19,7 @@ jobs:
       env:
         # כאן הטרנספורמציה עובדת!
         tags: ghcr.io/${{ github.repository | lower }}:latest        
-        #IMAGE_TAG: ghcr.io/${{ github.repository | lowser }}:latest
+        IMAGE_TAG: ghcr.io/${{ github.repository | lower }}:latest
       with:
         context: .
         push: true
